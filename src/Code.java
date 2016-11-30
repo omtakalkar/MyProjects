@@ -43,16 +43,16 @@ import edu.stanford.nlp.util.CoreMap;
  void DisplayNews() throws IOException 
 	{
 		 String[] siteURL = {"http://arstechnica.com/", "https://www.cnet.com/news/","http://www.digitaltrends.com/computing/"} ;
-	 int size = siteURL.length;
-	 for (int i=0; i<=size  ; i++)			  
-		  {
-			    doc = Jsoup.connect(siteURL[i]).get();
-			  	Elements elements = null;
-				elements=doc.select("p");
-				text=elements.text();
-			   // System.out.println("\t" +text +"\n");
-				DisplaySentimentWithNews();
-		 }	    
+		 int size = siteURL.length;
+		 for (int i=0; i<=size  ; i++)			  
+			  {
+				    doc = Jsoup.connect(siteURL[i]).get();
+				  	Elements elements = null;
+					elements=doc.select("p");
+					text=elements.text();
+				   // System.out.println("\t" +text +"\n");
+					DisplaySentimentWithNews();
+			 }	    
 	}
 	
 	
@@ -61,21 +61,18 @@ static	 void DisplaySentimentWithNews() throws IOException
 		
 		 System.out.println(text);
 		 Properties props = new Properties();
-        props.setProperty("annotators", "tokenize, ssplit, pos, lemma, parse, sentiment");
-        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
-       
-        //String news = text;
+		 props.setProperty("annotators", "tokenize, ssplit, pos, lemma, parse, sentiment");
+		 StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+		 Annotation document = new Annotation(text);
+		 pipeline.annotate(document);
         
-        Annotation document = new Annotation(text);
-        pipeline.annotate(document);
-        
-        List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
-        for (CoreMap sentence : sentences) 
-        {
-           sentiment = sentence.get(SentimentCoreAnnotations.SentimentClass.class);
-            System.out.println(sentiment + "\t" + sentence);
-        }
-        CountingWordsInNews();
+		 List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
+		 for (CoreMap sentence : sentences) 
+	        {
+	           sentiment = sentence.get(SentimentCoreAnnotations.SentimentClass.class);
+	            System.out.println(sentiment + "\t" + sentence);
+	        }
+		 CountingWordsInNews();
 	}
 	
 	static  void CountingWordsInNews()
@@ -86,14 +83,15 @@ static	 void DisplaySentimentWithNews() throws IOException
         for (int i1=0; i1<splitted.length ; i1++)
         {
             if (hm.containsKey(splitted[i1])) 
-            {
-               int cont = hm.get(splitted[i1]);
-               hm.put(splitted[i1], cont + 1);
-            } else 
-            {
-               hm.put(splitted[i1], 1);
-            }
-         }
+	            {
+	               int cont = hm.get(splitted[i1]);
+	               hm.put(splitted[i1], cont + 1);
+	            } 
+            else 
+	            {
+	               hm.put(splitted[i1], 1);
+	            }
+        }
         
          System.out.println(hm+"\n");
          DisplayNounVerbs();
@@ -104,11 +102,11 @@ static	 void DisplaySentimentWithNews() throws IOException
 	static void DisplayNounVerbs()
 	{
 		MaxentTagger tagger = new  MaxentTagger ("taggers/english-left3words-distsim.tagger");
-	     // String abc = text;
-	         String tagged = tagger.tagString(text);
-	         String taggedString = tagger.tagTokenizedString(tagged);
-	         System.out.println(taggedString+"\n");
-	         InsertIntoDatabase();
+	    // String abc = text;
+	    String tagged = tagger.tagString(text);
+	    String taggedString = tagger.tagTokenizedString(tagged);
+	    System.out.println(taggedString+"\n");
+	    InsertIntoDatabase();
 	}
 	
 	
@@ -120,8 +118,6 @@ static	 void DisplaySentimentWithNews() throws IOException
  		 try {
 			 			 
 	 		      con = DriverManager.getConnection(url, username, password);
-	 		     
-	 		      
 	 		      Class.forName(driver);	
 	 		      
 	 		      stmt = con.   createStatement();
@@ -142,10 +138,10 @@ static	 void DisplaySentimentWithNews() throws IOException
 			      ResultSet rs;
 			      rs = (ResultSet) stmt.executeQuery("SELECT * from sentiment");
 		            while ( rs.next() )
-		            {
-		                String arstechnicanews = rs.getString("sentiment");
-		                System.out.println(arstechnicanews);
-		            }
+			            {
+			                String arstechnicanews = rs.getString("sentiments");
+			                System.out.println(arstechnicanews);
+			            }
 		            CountingSentiments();
 	  
  		    } 
@@ -206,11 +202,8 @@ public class Code
 	{
 		// TODO Auto-generated method stub
 		news cde = new news();
-		
-			cde.DisplayNews();
-		
+		cde.DisplayNews();
 		news.DisplayNounVerbs();
-		
 		news.DisplaySentimentWithNews();
 		news.CountingWordsInNews();
 		news.DisplayNounVerbs();
