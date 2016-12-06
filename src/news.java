@@ -175,14 +175,20 @@ static	 void DisplaySentimentWithNews() throws IOException
 			     
 			      
 			      pstmt =con.prepareStatement("INSERT IGNORE sentiment(sentiments,register_date,Title,date,time) VALUES (?,?,?,?,?)");
-			      pstmt.setTimestamp(5, currentTimestamp);
-			      pstmt.setTimestamp(2, date);
-				  pstmt.setString(1, sentiment);
-				  pstmt.setDate(4, sqlDate);
-				  pstmt.setString(3, sentiment);
-						      
-					    	  pstmt.executeUpdate();
-					      
+			      int count = 0;
+			      int[] executeResult = null;
+				for (int i = 0; i < count; i++)
+			      {
+			      
+					      pstmt.setTimestamp(5, currentTimestamp);
+					      pstmt.setTimestamp(2, date);
+						  pstmt.setString(1, sentiment);
+						  pstmt.setDate(4, sqlDate);
+						  pstmt.setString(3, sentiment);
+						  pstmt.addBatch();
+						  
+						  executeResult = pstmt.executeBatch();
+			      }      
 			      ResultSet rs;
 			      rs = (ResultSet) stmt.executeQuery("SELECT * from sentiment");
 		            while ( rs.next() )
